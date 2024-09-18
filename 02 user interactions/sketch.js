@@ -10,7 +10,7 @@ function setup() {
 }
 
 function draw() {
-  background(0,50,120);
+  background(0,50,220);
 
   fill(110);
   triangle(0,700,1000,700,500,300);
@@ -26,4 +26,17 @@ function draw() {
 
   fill(180,180,0)
   circle(0,0,300)
+
+  fill(220)
+  circle(mouseX,mouseY-105,100)
+  circle(mouseX,mouseY,150)
+
+  fill(255,0,0)
+  triangle(mouseX-50,mouseY-155,mouseX,mouseY-185,mouseX+50,mouseY-155)
+  fill(0)
+  circle(mouseX-16,mouseY-119,14)
+  circle(mouseX+16,mouseY-119,14)
+  rect(mouseX-120,mouseY-30,70,10,30,30,0,0)
+  rect(mouseX+50,mouseY-30,70,10,30,30,0,0)
+  rect(mouseX+35,mouseY-80,70,10,30,30,0,0)
 }
