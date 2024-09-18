@@ -10,7 +10,7 @@ function setup() {
 }
 
 function draw() {
-  background(0,50,220);
+  background(0,50,120);
 
   fill(110);
   triangle(0,700,1000,700,500,300);
@@ -38,5 +38,5 @@ function draw() {
   circle(mouseX+16,mouseY-119,14)
   rect(mouseX-120,mouseY-30,70,10,30,30,0,0)
   rect(mouseX+50,mouseY-30,70,10,30,30,0,0)
-  rect(mouseX+35,mouseY-80,70,10,30,30,0,0)
+  rect(mouseX-25,mouseY-100,50,5,30,30,0,0)
 }
