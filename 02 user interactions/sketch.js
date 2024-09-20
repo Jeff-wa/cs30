@@ -31,7 +31,19 @@ function draw() {
   circle(mouseX,mouseY-105,100)
   circle(mouseX,mouseY,150)
 
+ if(mouseIsPressed === true){
   fill(255,0,0)
+  triangle(mouseX-50,mouseY-155,mouseX,mouseY-185,mouseX+50,mouseY-155)
+  fill(0)
+  circle(mouseX-16,mouseY-119,14)
+  circle(mouseX+16,mouseY-119,14)
+  line(mouseX-120,mouseY-60,mouseX-0,mouseY-0)
+  rect(mouseX-120,mouseY-30,70,10,30,30,0,0)
+  rect(mouseX+50,mouseY-30,70,10,30,30,0,0)
+  rect(mouseX-25,mouseY-100,50,5,30,30,0,0)
+ }
+
+  else{fill(255,0,0)
   triangle(mouseX-50,mouseY-155,mouseX,mouseY-185,mouseX+50,mouseY-155)
   fill(0)
   circle(mouseX-16,mouseY-119,14)
@@ -39,4 +51,5 @@ function draw() {
   rect(mouseX-120,mouseY-30,70,10,30,30,0,0)
   rect(mouseX+50,mouseY-30,70,10,30,30,0,0)
   rect(mouseX-25,mouseY-100,50,5,30,30,0,0)
+}
 }
