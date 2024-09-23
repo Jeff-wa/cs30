@@ -11,6 +11,9 @@ function setup() {
 
 function draw() {
   background(0,50,120);
+  if(keyIsPressed === true){
+  background(random(0,255),random(0,255),random(0,255))
+}
 
   fill(110);
   triangle(0,700,1000,700,500,300);
@@ -24,32 +27,35 @@ function draw() {
   fill(90,150,0)
   rect(0,700,2000,700,0,0,0,0)
 
+  fill(80)
+  rect(1200,350,200,350,0,0,0,0)
+  circle()
+
   fill(180,180,0)
   circle(0,0,300)
 
   fill(220)
   circle(mouseX,mouseY-105,100)
   circle(mouseX,mouseY,150)
-
- if(mouseIsPressed === true){
-  fill(255,0,0)
-  triangle(mouseX-50,mouseY-155,mouseX,mouseY-185,mouseX+50,mouseY-155)
   fill(0)
   circle(mouseX-16,mouseY-119,14)
   circle(mouseX+16,mouseY-119,14)
-  line(mouseX-120,mouseY-60,mouseX-0,mouseY-0)
+  fill(255,0,0)
+  triangle(mouseX-50,mouseY-155,mouseX,mouseY-185,mouseX+50,mouseY-155)
+
+ if(mouseIsPressed === true){
+  arc(mouseX, mouseY-100, 25, 25, 100, 10, PI + QUARTER_PI, CHORD);
   rect(mouseX-120,mouseY-30,70,10,30,30,0,0)
   rect(mouseX+50,mouseY-30,70,10,30,30,0,0)
-  rect(mouseX-25,mouseY-100,50,5,30,30,0,0)
  }
 
   else{fill(255,0,0)
   triangle(mouseX-50,mouseY-155,mouseX,mouseY-185,mouseX+50,mouseY-155)
   fill(0)
-  circle(mouseX-16,mouseY-119,14)
-  circle(mouseX+16,mouseY-119,14)
   rect(mouseX-120,mouseY-30,70,10,30,30,0,0)
   rect(mouseX+50,mouseY-30,70,10,30,30,0,0)
   rect(mouseX-25,mouseY-100,50,5,30,30,0,0)
-}
+}  
+
+
 }
