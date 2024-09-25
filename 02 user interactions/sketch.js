@@ -8,6 +8,7 @@
 function setup() {
   createCanvas(windowWidth, windowHeight);
 }
+
 function draw() {
   background(0,50,120);
   if(keyIsPressed === true){//press the keyboard can change the background to random colour. like sparkling lights
@@ -65,6 +66,10 @@ function draw() {
   fill(255,0,0)
   triangle(mouseX-50,mouseY-155,mouseX,mouseY-185,mouseX+50,mouseY-155)
 
+  textSize(50)//my name
+  fill(0)
+  text('Jeff Wang',50,900)
+  
  if(mouseIsPressed === true){//if you press the mouse, the character and npc will smile
   arc(mouseX, mouseY-100, 25, 25, 100, 10, PI + QUARTER_PI, CHORD);   
   arc(1200, 530, 25, 25, 100, 10, PI + QUARTER_PI, CHORD)
