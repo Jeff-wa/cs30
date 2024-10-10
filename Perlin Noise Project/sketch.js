@@ -24,7 +24,7 @@ function draw() {
     let y = noise(xoff) * height; 
     xoff += inc;
     fill(0, 0, 0);
-    rect(x, height-y, 2, y,); 
+    rect(x, height-y, 2, y); 
     if (y > maxY) {
       maxY = y;
       highestPeakX = x; 
