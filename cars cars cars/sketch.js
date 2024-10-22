@@ -4,19 +4,22 @@
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
-let vehicles 
+let eastbound = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  vehicles.push(new Vehicle(0, 'red', 100, 200, 1, 2));  // Car
-  vehicles.push(new Vehicle(1, 'blue', 300, 250, 0, 3)); // Truck
 }
 
 function draw() {
   background(220);
   drawRoad();
-  drawCar();
-  drawTruck();
+  for (let i = 0; i < eastbound.length; i++) {
+    eastbound[i].action(); 
+  }
+}
+
+function mouseClicked() {
+  eastbound.push(new Vehicle(mouseX, mouseY, 1, 2)); 
 }
 
 function drawRoad() {
@@ -36,13 +39,18 @@ function drawRoad() {
 }
 
 class Vehicle {
-  constructor(vehicleType, color, x, y, direction, xSpeed) {
-    this.type = vehicleType; 
-    this.color = color;
+  constructor(x, y, dir, xSpeed) {
+    this.type = int(random(2)); 
+    this.c = color(random(255), random(255), random(255));
     this.x = x;
     this.y = y;
-    this.direction = direction;
+    this.dir = dir;
     this.xSpeed = xSpeed;
+  }
+
+  action() {
+    this.display();
+    this.x += this.xSpeed; // Move the vehicle east
   }
 
   display() {
@@ -54,13 +62,17 @@ class Vehicle {
   }
 
   drawCar() {
-    fill(this.color);
-    rect(this.x, this.y, 50, 30); 
+    fill(220)
+    rect(this.x+5,this.y-15,20,70) 
+    rect(this.x+75,this.y-15,20,70)
+    fill(this.c);
+    rect(this.x, this.y, 100, 40);
+    
   }
 
   drawTruck() {
-    fill(this.color);
-    rect(this.x, this.y, 70, 40); 
-    rect(this.x + 10, this.y - 20, 40, 20); 
+    fill(this.c); // Use this.c for the color
+    rect(this.x, this.y, 180, 60); 
+    rect(this.x + 150, this.y, 30, 60); 
   }
-  }
+}
