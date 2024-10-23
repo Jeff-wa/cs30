@@ -4,7 +4,7 @@
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
-let eastbound = [];
+let vehicles = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -13,13 +13,23 @@ function setup() {
 function draw() {
   background(220);
   drawRoad();
-  for (let i = 0; i < eastbound.length; i++) {
-    eastbound[i].action(); 
+  
+  for (let vehicle of vehicles) {
+    vehicle.action(); 
   }
 }
 
 function mouseClicked() {
-  eastbound.push(new Vehicle(mouseX, mouseY, 1, 2)); 
+
+  if (mouseY < height / 2) {
+    this.dir = -1;
+    this.xSpeed = random(-15, -1); 
+  } else {
+    this.dir = 1;
+    this.xSpeed = random(1, 15); 
+  }
+
+  vehicles.push(new Vehicle(mouseX, mouseY, this.dir, this.xSpeed)); 
 }
 
 function drawRoad() {
@@ -43,14 +53,49 @@ class Vehicle {
     this.type = int(random(2)); 
     this.c = color(random(255), random(255), random(255));
     this.x = x;
-    this.y = y;
-    this.dir = dir;
-    this.xSpeed = xSpeed;
+    this.y = y; 
+    this.dir = dir; 
+    this.xSpeed = xSpeed; 
   }
 
+  move() {
+    this.x += this.xSpeed; 
+    if (this.x > width) {
+      this.x = 0; 
+    } else if (this.x < 0) {
+      this.x = width; 
+    }
+  }
+
+  Speedup() {
+    if (this.dir === 1) { 
+      if (random() < 0.02) {
+        this.xSpeed = min(this.xSpeed + random(0.1, 0.5), 15); 
+      }
+    } else { 
+      if (random() < 0.02) {
+        this.xSpeed = max(this.xSpeed - random(0.1, 0.5), -15); 
+      }
+     
+    }
+  }
+
+  SpeedDown(){
+    if(this.dir === -1){
+      if (random() < 0.02) {
+        this.xSpeed = max(this.xSpeed - random(0.1, 0.5), 1); // Slow down
+      } 
+    }else{
+      if (random() < 0.02) {
+        this.xSpeed = min(this.xSpeed + random(0.1, 0.5), -1); // Slow down
+      }
+    }
+  }
   action() {
-    this.display();
-    this.x += this.xSpeed; // Move the vehicle east
+    this.SpeedDown();
+    this.Speedup(); // Adjust speed before moving
+    this.move(); // Move the vehicle
+    this.display(); // Render the vehicle
   }
 
   display() {
@@ -62,16 +107,15 @@ class Vehicle {
   }
 
   drawCar() {
-    fill(220)
-    rect(this.x+5,this.y-15,20,70) 
-    rect(this.x+75,this.y-15,20,70)
+    fill(220);
+    rect(this.x + 5, this.y - 15, 20, 70); 
+    rect(this.x + 75, this.y - 15, 20, 70);
     fill(this.c);
     rect(this.x, this.y, 100, 40);
-    
   }
 
   drawTruck() {
-    fill(this.c); // Use this.c for the color
+    fill(this.c);
     rect(this.x, this.y, 180, 60); 
     rect(this.x + 150, this.y, 30, 60); 
   }
