@@ -5,32 +5,42 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 let vehicles = [];
+let trafficLight;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  trafficLight = new TrafficLight();
 }
 
 function draw() {
   background(220);
   drawRoad();
   
+  trafficLight.update();
+  trafficLight.display();
+  
   for (let vehicle of vehicles) {
-    vehicle.action(); 
+    vehicle.action();
   }
 }
+
 
 function mouseClicked() {
-
-  if (mouseY < height / 2) {
-    this.dir = -1;
-    this.xSpeed = random(-15, -1); 
-  } else {
-    this.dir = 1;
-    this.xSpeed = random(1, 15); 
+  if (trafficLight.isMouseOver(mouseX, mouseY)) {
+    trafficLight.toggle();
+    return; 
   }
-
-  vehicles.push(new Vehicle(mouseX, mouseY, this.dir, this.xSpeed)); 
-}
+  let dir, xSpeed;
+  if (mouseButton === LEFT) {
+    dir = 1; 
+    xSpeed = random(1, 15); 
+  } 
+  if (mouseButton === LEFT && keyIsDown(SHIFT)) {
+    dir = -1; 
+    xSpeed = random(-15, -1); 
+  } 
+    vehicles.push(new Vehicle(mouseX, mouseY, dir, xSpeed)); 
+  }
 
 function drawRoad() {
   fill(50);
@@ -68,34 +78,38 @@ class Vehicle {
   }
 
   Speedup() {
-    if (this.dir === 1) { 
-      if (random() < 0.02) {
-        this.xSpeed = min(this.xSpeed + random(0.1, 0.5), 15); 
+    if (this.xSpeed < 15, dir === 1) {
+      if(random() < 0.02){
+        this.xSpeed = min(this.xSpeed + random(0.1, 0.5), 15);
       }
-    } else { 
-      if (random() < 0.02) {
-        this.xSpeed = max(this.xSpeed - random(0.1, 0.5), -15); 
-      }
-     
+    }
+    if (this.xSpeed > -15, dir === -1) {
+      if(random() < 0.02){
+        this.xSpeed = min(this.xSpeed - random(0.1, 0.5), -15);
     }
   }
+}
 
-  SpeedDown(){
-    if(this.dir === -1){
-      if (random() < 0.02) {
-        this.xSpeed = max(this.xSpeed - random(0.1, 0.5), 1); // Slow down
-      } 
-    }else{
-      if (random() < 0.02) {
-        this.xSpeed = min(this.xSpeed + random(0.1, 0.5), -1); // Slow down
+  SpeedDown() {
+    if (this.xSpeed > 1, dir === 1) {
+      if (random() < 0.02){
+        this.xSpeed = max(this.xSpeed - random(0.1, 0.5), 1);
       }
     }
+    if(this.xSpeed <-1, dir === -1){
+      if(random() < 0.02){
+      this.xSpeed = min(this.xSpeed + random(0.1, 0.5), -1)
+    }
   }
+}
+
   action() {
-    this.SpeedDown();
-    this.Speedup(); // Adjust speed before moving
-    this.move(); // Move the vehicle
-    this.display(); // Render the vehicle
+    if (!trafficLight.isRed) { 
+      this.SpeedDown();
+      this.Speedup(); 
+      this.move(); 
+    }
+    this.display(); 
   }
 
   display() {
@@ -118,5 +132,31 @@ class Vehicle {
     fill(this.c);
     rect(this.x, this.y, 180, 60); 
     rect(this.x + 150, this.y, 30, 60); 
+  }
+}
+
+class TrafficLight {
+  constructor() {
+    this.isRed = false;
+    this.width = 50;
+    this.height = 100;
+    this.x = width / 2 - this.width / 2;
+    this.y = 10; 
+  }
+
+  display() {
+    fill(this.isRed ? 'red' : 'green');
+    rect(this.x, this.y, this.width, this.height);
+  }
+
+  toggle() {
+    this.isRed = !this.isRed;
+  }
+
+  isMouseOver(mx, my) {
+    return mx > this.x && mx < this.x + this.width && my > this.y && my < this.y + this.height;
+  }
+  update(){
+
   }
 }
