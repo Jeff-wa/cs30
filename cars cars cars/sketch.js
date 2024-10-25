@@ -78,30 +78,36 @@ class Vehicle {
   }
 
   Speedup() {
-    if (this.xSpeed < 15, dir === 1) {
-      if(random() < 0.02){
-        this.xSpeed = min(this.xSpeed + random(0.1, 0.5), 15);
+    if (this.dir === 1) { // Moving east
+      if (this.xSpeed < 15) {
+        if (random() < 0.02) {
+          this.xSpeed = min(this.xSpeed + random(0.1, 0.5), 15);
+        }
+      }
+    } else if (this.dir === -1) { // Moving west
+      if (this.xSpeed > -1) {
+        if (random() < 0.02) {
+          this.xSpeed = max(this.xSpeed - random(0.1, 0.5), -1);
+        }
       }
     }
-    if (this.xSpeed > -15, dir === -1) {
-      if(random() < 0.02){
-        this.xSpeed = min(this.xSpeed - random(0.1, 0.5), -15);
-    }
   }
-}
 
   SpeedDown() {
-    if (this.xSpeed > 1, dir === 1) {
-      if (random() < 0.02){
-        this.xSpeed = max(this.xSpeed - random(0.1, 0.5), 1);
+    if (this.dir === 1) { // Moving east
+      if (this.xSpeed > 1) {
+        if (random() < 0.02) {
+          this.xSpeed = max(this.xSpeed - random(0.1, 0.5), 1);
+        }
+      }
+    } else if (this.dir === -1) { // Moving west
+      if (this.xSpeed < -1) {
+        if (random() < 0.02) {
+          this.xSpeed = min(this.xSpeed + random(0.1, 0.5), -1);
+        }
       }
     }
-    if(this.xSpeed <-1, dir === -1){
-      if(random() < 0.02){
-      this.xSpeed = min(this.xSpeed + random(0.1, 0.5), -1)
-    }
   }
-}
 
   action() {
     if (!trafficLight.isRed) { 
