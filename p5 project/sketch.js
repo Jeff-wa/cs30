@@ -1,149 +1,113 @@
-let vehicles = [];
-let trafficLight;
+/*
+ * Puzzle Game
+ * Author: [Your Name]
+ * Description: A simple puzzle game where clicking toggles squares. 
+ * Features include randomized starting arrangement, win condition,
+ * shift-click functionality, and the ability to toggle between cross and square flipping.
+ */
+
+let NUM_ROWS = 4;
+let NUM_COLS = 5;
+let rectWidth, rectHeight;
+let currentRow, currentCol;
+let gridData = [[0, 0, 0, 0, 0],
+                 [0, 0, 0, 0, 0],
+                 [0, 255, 0, 0, 0],
+                 [255, 255, 255, 0, 0]];
+
+let isCrossPattern = true; // Initialize pattern type
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  trafficLight = new TrafficLight();
+  rectWidth = width / NUM_COLS;
+  rectHeight = height / NUM_ROWS;
+  randomizeBoard(); // Randomize the starting board
 }
 
 function draw() {
   background(220);
-  drawRoad();
-  
-  trafficLight.update();
-  trafficLight.display();
-  
-  for (let vehicle of vehicles) {
-    vehicle.action();
-  }
+  determineActiveSquare();   // Determine which tile the mouse cursor is over            // Draw the overlay indicating affected squares
+  drawGrid();                // Render the current game board to the screen
+  checkWinCondition();       // Check for win condition
 }
 
-function mouseClicked() {
-  // Check if the traffic light was clicked
-  if (trafficLight.isMouseOver(mouseX, mouseY)) {
-    trafficLight.toggle();
-    return; // Don't add a vehicle if the traffic light was clicked
-  }
-
-  let dir, xSpeed;
-  if (mouseButton === LEFT) {
-    dir = 1; // eastbound
-    xSpeed = random(1, 15); 
-  } 
-  if (mouseButton === LEFT && keyIsDown(SHIFT)) {
-    dir = -1; // westbound
-    xSpeed = random(-15, -1); 
-  } 
-
-  vehicles.push(new Vehicle(mouseX, height / 2, dir, xSpeed)); 
-}
-
-function drawRoad() {
-  fill(50);
-  rect(0, 0, width, height);
-  
-  stroke(255); 
-  strokeWeight(4);
-  
-  let dashLength = 10; 
-  let spaceLength = 10; 
-  let y = height / 2; 
-  
-  for (let i = 0; i < width; i += dashLength + spaceLength) {
-    line(i, y, i + dashLength, y);
-  }
-}
-
-class Vehicle {
-  constructor(x, y, dir, xSpeed) {
-    this.type = int(random(2)); 
-    this.c = color(random(255), random(255), random(255));
-    this.x = x;
-    this.y = y; 
-    this.dir = dir; 
-    this.xSpeed = xSpeed; 
-  }
-
-  move() {
-    this.x += this.xSpeed; 
-    if (this.x > width) {
-      this.x = 0; 
-    } else if (this.x < 0) {
-      this.x = width; 
-    }
-  }
-
-  Speedup() {
-    if (this.xSpeed < 15) {
-      if (random() < 0.02) {
-        this.xSpeed = min(this.xSpeed + random(0.1, 0.5), 15);
+function mousePressed() {
+  if (keyIsDown(SHIFT)) { // Check for shift key press
+    flip(currentCol, currentRow); // Flip only the square under the mouse
+  } else {
+    // Flip based on current pattern type
+    flip(currentCol, currentRow); // Flip center square
+    if (isCrossPattern) {
+      // Cross-shaped pattern flips
+      flip(currentCol - 1, currentRow);
+      flip(currentCol + 1, currentRow);
+      flip(currentCol, currentRow - 1);
+      flip(currentCol, currentRow + 1);
+    } else {
+      // Square pattern flips
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          flip(currentCol + j, currentRow + i);
+        }
       }
     }
   }
+}
 
-  SpeedDown() {
-    if (this.xSpeed > 1) {
-      if (random() < 0.02) {
-        this.xSpeed = max(this.xSpeed - random(0.1, 0.5), 1);
-      }
-    }
-  }
-
-  action() {
-    if (!trafficLight.isRed) { // Check if the light is red
-      this.SpeedDown();
-      this.Speedup(); 
-      this.move(); 
-    }
-    this.display(); 
-  }
-
-  display() {
-    if (this.type === 0) {
-      this.drawCar();
-    } else if (this.type === 1) {
-      this.drawTruck();
-    }
-  }
-
-  drawCar() {
-    fill(220);
-    rect(this.x + 5, this.y - 15, 20, 70); 
-    rect(this.x + 75, this.y - 15, 20, 70);
-    fill(this.c);
-    rect(this.x, this.y, 100, 40);
-  }
-
-  drawTruck() {
-    fill(this.c);
-    rect(this.x, this.y, 180, 60); 
-    rect(this.x + 150, this.y, 30, 60); 
+function flip(col, row) {
+  // Flip the value from 0 to 255 or 255 to 0 if within bounds
+  if (col >= 0 && col < NUM_COLS && row >= 0 && row < NUM_ROWS) {
+    gridData[row][col] = gridData[row][col] === 0 ? 255 : 0;
   }
 }
 
-class TrafficLight {
-  constructor() {
-    this.isRed = false;
-    this.width = 50;
-    this.height = 100;
-    this.x = width / 2 - this.width / 2;
-    this.y = 10; // Position at the top of the window
-  }
+function determineActiveSquare() {
+  currentRow = int(mouseY / rectHeight);
+  currentCol = int(mouseX / rectWidth);
+}
 
-  display() {
-    fill(this.isRed ? 'red' : 'green');
-    rect(this.x, this.y, this.width, this.height);
-  }
 
-  toggle() {
-    this.isRed = !this.isRed;
+function drawGrid() {
+  // Render a grid of squares based on the 2D array
+  for (let x = 0; x < NUM_COLS; x++) {
+    for (let y = 0; y < NUM_ROWS; y++) {
+      fill(gridData[y][x]);
+      rect(x * rectWidth, y * rectHeight, rectWidth, rectHeight);
+    }
   }
+}
 
-  isMouseOver(mx, my) {
-    return mx > this.x && mx < this.x + this.width && my > this.y && my < this.y + this.height;
+function checkWinCondition() {
+  // Check if all elements are the same
+  let firstValue = gridData[0][0];
+  for (let row of gridData) {
+    for (let cell of row) {
+      if (cell !== firstValue) {
+        return; // Not all the same
+      }
+    }
   }
+  displayWinMessage(); // Display win message
+}
 
-  update() {
-    // You can add more logic here if needed, like changing the light automatically
+function displayWinMessage() {
+  fill(0);
+  textSize(32);
+  textAlign(CENTER);
+  text("You Win!", width / 2, height / 2);
+}
+
+function randomizeBoard() {
+  // Randomly assign 0 or 255 to each cell in the board
+  for (let y = 0; y < NUM_ROWS; y++) {
+    for (let x = 0; x < NUM_COLS; x++) {
+      gridData[y][x] = random([0, 255]);
+    }
+  }
+}
+
+function keyPressed() {
+  if (key === ' ') { // Toggle between cross and square patterns
+    isCrossPattern = !isCrossPattern;
   }
 }
