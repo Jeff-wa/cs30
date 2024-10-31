@@ -24,8 +24,9 @@ function setup() {
 
 function draw() {
   background(220);
-  determineActiveSquare();// Determine which tile the mouse cursor is over    // Draw the overlay indicating affected squares
-  drawGrid();  // Render the current game board to the screen
+  determineActiveSquare();
+  drawGrid();// Determine which tile the mouse cursor is over    // Draw the overlay indicating affected squares
+  overLay();  // Render the current game board to the screen
   Win(); //check win condition     
 }
 
@@ -46,16 +47,15 @@ function mousePressed() {
 }
 }
 }
-
 function flip(col, row) { // given a column and row for the 2D array, flip its value from 0 to 255 or 255 to 0
-// conditions ensure that the col and row given are valid and exist for the array. If not, no operations take place.
-if (col >= 0 && col < NUM_COLS ){
-  if (row >= 0 && row < NUM_ROWS){
-    if (gridData[row][col] === 0) gridData[row][col] = 255;
-    else gridData[row][col] = 0;
+  // conditions ensure that the col and row given are valid and exist for the array. If not, no operations take place.
+  if (col >= 0 && col < NUM_COLS ){
+    if (row >= 0 && row < NUM_ROWS){
+      if (gridData[row][col] === 0) gridData[row][col] = 255;
+      else gridData[row][col] = 0;
+    }
   }
-}
-}
+  }
 
 function determineActiveSquare() {// An expression to run each frame to determine where the mouse currently is.
   currentRow = int(mouseY / rectHeight);
@@ -104,4 +104,35 @@ function keyPressed() { //change cross-shape or square shape
     isCrossPattern = !isCrossPattern;
   }
 }
+function overLay() {
+  fill(0, 255, 0, 100); // Semi-transparent green for the overlay
 
+  if (isCrossPattern) {
+    rect(currentCol * rectWidth, currentRow * rectHeight, rectWidth, rectHeight);
+    // Cross pattern overlay
+    if (currentRow > 0) {
+      rect(currentCol * rectWidth, (currentRow - 1) * rectHeight, rectWidth, rectHeight); // Above
+    }
+    if (currentCol > 0) {
+      rect((currentCol - 1) * rectWidth, currentRow * rectHeight, rectWidth, rectHeight); // Left
+    }
+    if (currentCol < NUM_COLS - 1) {
+      rect((currentCol + 1) * rectWidth, currentRow * rectHeight, rectWidth, rectHeight); // Right
+    }
+    if (currentRow < NUM_ROWS - 1) {
+      rect(currentCol * rectWidth, (currentRow + 1) * rectHeight, rectWidth, rectHeight); // Below
+    }
+  } else {
+    // New pattern overlay
+    rect(currentCol * rectWidth, currentRow * rectHeight, rectWidth, rectHeight); // Center square
+    if (currentRow > 0) {
+      rect(currentCol * rectWidth, (currentRow - 1) * rectHeight, rectWidth, rectHeight); // Above
+    }
+    if (currentCol > 0) {
+      rect((currentCol - 1) * rectWidth, currentRow * rectHeight, rectWidth, rectHeight); // Left
+    }
+    if (currentCol > 0 && currentRow > 0) {
+      rect((currentCol - 1) * rectWidth, (currentRow - 1) * rectHeight, rectWidth, rectHeight); // Left above
+    }
+  }
+}
