@@ -1,8 +1,5 @@
-// Project Title: Dynamic Tree Branching
-// Your Name
-// Date
-
 let scale = 15;
+let leafDepth = 5; // Start with a leaf threshold of depth 5
 
 function setup() {
   createCanvas(500, 500);
@@ -11,7 +8,16 @@ function setup() {
 
 function draw() {
   background(255); // Clear canvas every frame
+  randomSeed(100); // Ensure that random values are consistent across frames
   drawTree(width / 2, height * 0.9, 90, 6); // Draw tree at the center bottom of the canvas
+}
+
+function keyPressed() {
+  if (key === 'z' || key === 'Z') {
+    leafDepth = max(1, leafDepth - 1); // Decrease leaf depth, but don't go below 1
+  } else if (key === 'x' || key === 'X') {
+    leafDepth = min(6, leafDepth + 1); // Increase leaf depth, but don't go above 6
+  }
 }
 
 function drawLine(x1, y1, x2, y2, depth) {
@@ -21,22 +27,25 @@ function drawLine(x1, y1, x2, y2, depth) {
 
 function drawTree(x1, y1, angle, depth) {
   if (depth > 0) {
-    // Adjust the angle range based on mouseX position
-    let spread = map(mouseX, 0, width, 5, 45); // Map mouseX to angle spread between 5 and 45 degrees
-    let x2 = x1 + cos(radians(angle)) * depth * scale;  // Calculate endpoint of the current branch
-    let y2 = y1 - sin(radians(angle)) * depth * scale;  // Get shorter based on depth
+    let spread = map(mouseX, 0, width, 5, 15); // Map mouseX to angle spread between 5 and 15 degrees
+    let x2 = x1 + cos(radians(angle)) * depth * scale;
+    let y2 = y1 - sin(radians(angle)) * depth * scale;
 
     drawLine(x1, y1, x2, y2, depth);
-    
-    // Draw a small circle at the end of the branch with a random color
-    noStroke();
-    let circleColor = color(random(255), random(255), random(255)); 
-    fill(circleColor);
-    ellipse(x2, y2, 12, 12);  // Draw circle at the branch's end
 
-    // Recursively draw the three branches with increasing angles based on the mouse position
-    drawTree(x2, y2, angle - spread, depth - 1);  // Left branch
-    drawTree(x2, y2, angle, depth - 1);           // Center branch
-    drawTree(x2, y2, angle + spread, depth - 1);  // Right branch
+    // Draw leaves if depth is less than or equal to leafDepth
+    if (depth <= leafDepth) {
+      noStroke();
+      let leafSize = map(depth, 1, leafDepth, 10, 30); // Smaller leaf size at higher depths
+      let circleColor = color(random(255), random(255), random(255)); // Random color for leaves
+      fill(circleColor);
+      ellipse(x2, y2, leafSize, random(leafSize * 0.5, leafSize)); // Randomize leaf shape
+    }
+
+    // Recursively draw branches
+    let newDepth = depth - 1;
+    drawTree(x2, y2, angle - spread, newDepth);  // Left branch
+    drawTree(x2, y2, angle, newDepth);           // Center branch
+    drawTree(x2, y2, angle + spread, newDepth);  // Right branch
   }
 }
