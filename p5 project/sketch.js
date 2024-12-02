@@ -1,51 +1,214 @@
-let scale = 15;
-let leafDepth = 5; // Start with a leaf threshold of depth 5
+// Game variables
+let player;
+let obstacles = [];
+let powerUps = [];
+let score = 0;
+let level = 1;
+let gameSpeed = 1;
+let gameOver = false;
 
 function setup() {
-  createCanvas(500, 500);
-  background(255);
+  createCanvas(400, 600);
+  player = new Player();
+  frameRate(60);
 }
 
 function draw() {
-  background(255); // Clear canvas every frame
-  randomSeed(100); // Ensure that random values are consistent across frames
-  drawTree(width / 2, height * 0.9, 90, 6); // Draw tree at the center bottom of the canvas
-}
+  background(220);
 
-function keyPressed() {
-  if (key === 'z' || key === 'Z') {
-    leafDepth = max(1, leafDepth - 1); // Decrease leaf depth, but don't go below 1
-  } else if (key === 'x' || key === 'X') {
-    leafDepth = min(6, leafDepth + 1); // Increase leaf depth, but don't go above 6
+  if (gameOver) {
+    displayGameOver();
+    return;
   }
-}
 
-function drawLine(x1, y1, x2, y2, depth) {
-  stroke(0);
-  line(x1, y1, x2, y2);
-}
+  // Update and display player
+  player.update();
+  player.display();
 
-function drawTree(x1, y1, angle, depth) {
-  if (depth > 0) {
-    let spread = map(mouseX, 0, width, 5, 15); // Map mouseX to angle spread between 5 and 15 degrees
-    let x2 = x1 + cos(radians(angle)) * depth * scale;
-    let y2 = y1 - sin(radians(angle)) * depth * scale;
+  // Handle obstacles
+  if (frameCount % (60 / gameSpeed) === 0) {
+    obstacles.push(new Obstacle());
+    if (random() < 0.2) {
+      powerUps.push(new PowerUp());
+    }
+  }
 
-    drawLine(x1, y1, x2, y2, depth);
+  // Update and display obstacles
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    obstacles[i].update();
+    obstacles[i].display();
 
-    // Draw leaves if depth is less than or equal to leafDepth
-    if (depth <= leafDepth) {
-      noStroke();
-      let leafSize = map(depth, 1, leafDepth, 10, 30); // Smaller leaf size at higher depths
-      let circleColor = color(random(255), random(255), random(255)); // Random color for leaves
-      fill(circleColor);
-      ellipse(x2, y2, leafSize, random(leafSize * 0.5, leafSize)); // Randomize leaf shape
+    // Check for collision with player
+    if (obstacles[i].hits(player)) {
+      gameOver = true;
     }
 
-    // Recursively draw branches
-    let newDepth = depth - 1;
-    drawTree(x2, y2, angle - spread, newDepth);  // Left branch
-    drawTree(x2, y2, angle, newDepth);           // Center branch
-    drawTree(x2, y2, angle + spread, newDepth);  // Right branch
+    // Remove obstacles that are offscreen
+    if (obstacles[i].offscreen()) {
+      obstacles.splice(i, 1);
+      score++;
+      if (score % 10 === 0) {
+        levelUp();
+      }
+    }
   }
+
+  // Update and display power-ups
+  for (let i = powerUps.length - 1; i >= 0; i--) {
+    powerUps[i].update();
+    powerUps[i].display();
+
+    // Check if player collects a power-up
+    if (powerUps[i].hits(player)) {
+      powerUps.splice(i, 1);
+      score += 5; // Power-up gives extra points
+    }
+
+    // Remove power-ups that are offscreen
+    if (powerUps[i].offscreen()) {
+      powerUps.splice(i, 1);
+    }
+  }
+
+  // Display score and level
+  displayScore();
+}
+
+// Display score and level at the top left
+function displayScore() {
+  fill(0);
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text("Score: " + score, 10, 10);
+  text("Level: " + level, 10, 30);
+}
+
+// Display Game Over screen
+function displayGameOver() {
+  fill(0);
+  textSize(48);
+  textAlign(CENTER, CENTER);
+  text("GAME OVER", width / 2, height / 2 - 50);
+  textSize(24);
+  text("Final Score: " + score, width / 2, height / 2 + 10);
+  textSize(18);
+  text("Press R to Restart", width / 2, height / 2 + 50);
+}
+
+// Handle player movement
+function keyPressed() {
+  if (keyCode === LEFT_ARROW) {
+    player.move(-1);
+  } else if (keyCode === RIGHT_ARROW) {
+    player.move(1);
+  }
+
+  if (key === 'r' || key === 'R') {
+    restartGame();
+  }
+}
+
+function keyReleased() {
+  player.move(0);
+}
+
+// Player class
+class Player {
+  constructor() {
+    this.x = width / 2;
+    this.y = height - 40;
+    this.width = 40;
+    this.height = 40;
+    this.xSpeed = 0;
+  }
+
+  update() {
+    this.x += this.xSpeed * 5;
+    this.x = constrain(this.x, 0, width - this.width); // Prevent going off-screen
+  }
+
+  move(dir) {
+    this.xSpeed = dir;
+  }
+
+  display() {
+    fill(0, 255, 0);
+    noStroke();
+    rect(this.x, this.y, this.width, this.height);
+  }
+}
+
+// Obstacle class
+class Obstacle {
+  constructor() {
+    this.x = random(width);
+    this.y = 0;
+    this.size = random(20, 50);
+    this.speed = random(2, 5) * gameSpeed;
+  }
+
+  update() {
+    this.y += this.speed;
+  }
+
+  display() {
+    fill(255, 0, 0);
+    noStroke();
+    ellipse(this.x, this.y, this.size);
+  }
+
+  offscreen() {
+    return this.y > height;
+  }
+
+  hits(player) {
+    let d = dist(this.x, this.y, player.x + player.width / 2, player.y + player.height / 2);
+    return d < this.size / 2 + player.width / 2;
+  }
+}
+
+// Power-up class
+class PowerUp {
+  constructor() {
+    this.x = random(width);
+    this.y = 0;
+    this.size = 20;
+    this.speed = 3;
+  }
+
+  update() {
+    this.y += this.speed;
+  }
+
+  display() {
+    fill(0, 0, 255);
+    noStroke();
+    ellipse(this.x, this.y, this.size);
+  }
+
+  offscreen() {
+    return this.y > height;
+  }
+
+  hits(player) {
+    let d = dist(this.x, this.y, player.x + player.width / 2, player.y + player.height / 2);
+    return d < this.size / 2 + player.width / 2;
+  }
+}
+
+// Level up function
+function levelUp() {
+  level++;
+  gameSpeed += 0.5; // Increase the speed of obstacles
+}
+  
+// Restart the game
+function restartGame() {
+  player = new Player();
+  obstacles = [];
+  powerUps = [];
+  score = 0;
+  level = 1;
+  gameSpeed = 1;
+  gameOver = false;
 }
