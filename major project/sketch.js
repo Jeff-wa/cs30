@@ -1,17 +1,17 @@
-let hook;          // To hold the hook object
-let swingLength;   // Length of the rope
-let angle = -Math.PI ; // Starting angle of the rope (45 degrees)
-let swingSpeed = 0.02;   // Speed of the swinging
-let maxLength = 400; // Max length the rope can stretch
-let minLength = 200; // Minimum length of the rope (resting position)
-let minerImage;     // Placeholder for miner image
+let hook;          
+let swingLength;   
+let angle = -Math.PI ; 
+let swingSpeed = 0.02;   
+let maxLength = 400; 
+let minLength = 200; 
+let minerImage;    
 
 
 function setup() {
   createCanvas(1000, 1000);
   
   hook = new Hook();
-  swingLength = minLength; // Start at minimum length
+  swingLength = minLength; 
 }
 
 function draw() {
@@ -33,23 +33,33 @@ function draw() {
 
 class Hook {
   constructor() {
-    this.x = width/2; // Starting position of the rope (center)
-    this.y = 200; // Position where the rope is attached (the top of the circle)
-    this.originX = this.x; // Store the original X position
-    this.originY = this.y; // Store the original Y position
-    this.angle = -Math.PI / 2; // Starting angle of the rope
-    this.swingSpeed = 0.02; // Swing speed
+    this.x = width/2; 
+    this.y = 200; 
+    this.originX = this.x; 
+    this.originY = this.y; 
+    this.angle = Math.PI/2; 
+    this.swingSpeed = 0.01; 
+    
   }
 
   show() {
-    // Draw the rope (line)
-    stroke(0);
-    line(this.x, this.y, this.x + swingLength * cos(this.angle), this.y + swingLength * sin(this.angle));
-    
-    // Draw the hook (the end of the rope)
+    // Calculate the end position of the rope
+    let ropeX = this.x + swingLength * cos(this.angle);
+    let ropeY = this.y + swingLength * sin(this.angle);
+    line(this.x, this.y, ropeX, ropeY);
+    push(); 
+    translate(ropeX, ropeY);
+    rotate(this.angle + Math.PI / 2); 
     fill(0);
-    ellipse(this.x + swingLength * cos(this.angle), this.y + swingLength * sin(this.angle), 20, 20); // Hook
+    triangle(0, -15, -5, 0, 5, 0);
+    triangle(-7,-15,-7,0,0,0)
+    triangle(7,-15,7,0,0,0) // Triangle representing the hook
+    arc(0, 0, 10, 10, PI, 0); 
+    pop(); // Restore the previous drawing state
   }
+    
+   
+
 
   update() {
     // If the mouse is clicked, elongate the rope
@@ -64,7 +74,7 @@ class Hook {
     this.angle += this.swingSpeed;
     
     // Reverse direction when reaching the limit of the swing
-    if (this.angle > Math.PI  || this.angle < -Math.PI ) {
+    if (this.angle > Math.PI  || this.angle < 0 ) {
       this.swingSpeed *= -1;
     }
   }
