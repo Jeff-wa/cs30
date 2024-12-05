@@ -2,7 +2,7 @@ let hook;
 let swingLength;   
 let angle = -Math.PI ; 
 let swingSpeed = 0.02;   
-let maxLength = 400; 
+let maxLength = 800; 
 let minLength = 200; 
 let minerImage;    
 
@@ -58,24 +58,29 @@ class Hook {
     pop(); // Restore the previous drawing state
   }
     
-   
-
-
-  update() {
-    // If the mouse is clicked, elongate the rope
-    if (mouseIsPressed && mouseButton === LEFT) {
-      swingLength = constrain(swingLength + 2, minLength, maxLength);
-    } else {
-      // Otherwise, return to the minimum length
-      swingLength = constrain(swingLength - 2, minLength, maxLength);
-    }
-
-    // Swinging logic (oscillate back and forth)
-    this.angle += this.swingSpeed;
     
-    // Reverse direction when reaching the limit of the swing
-    if (this.angle > Math.PI  || this.angle < 0 ) {
-      this.swingSpeed *= -1;
+  update() {
+    // If the mouse is pressed, elongate the rope but stop swinging temporarily
+    if (mouseIsPressed && mouseButton === LEFT) {
+      swingLength = constrain(swingLength + 4, minLength, maxLength);
+      this.swingSpeed = 0;  // Stop swinging while elongating
+    } else {
+      // Once the mouse is released, allow the rope to swing
+      if (swingLength === maxLength) {
+        // Only start swinging again once the rope has reached its maximum length
+        this.swingSpeed = 0.01;
+      }
+      
+      // Swinging logic (oscillate back and forth)
+      this.angle += this.swingSpeed;
+
+      // Reverse direction when reaching the limit of the swing
+      if (this.angle > Math.PI || this.angle < 0) {
+        this.swingSpeed *= -1;  // Reverse the swing direction
+      }
+
+      // When the rope is not being elongated, it should return to the minimum length
+      swingLength = constrain(swingLength - 4, minLength, maxLength);
     }
   }
 }
