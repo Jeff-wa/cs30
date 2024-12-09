@@ -2,7 +2,7 @@ let hook;
 let swingLength;   
 let angle = -Math.PI ; 
 let swingSpeed = 0.02;   
-let maxLength = 800; 
+let maxLength = 600; 
 let minLength = 200; 
 let minerImage;    
 
@@ -61,13 +61,13 @@ class Hook {
     
   update() {
     // If the mouse is pressed, elongate the rope but stop swinging temporarily
-    if (mouseIsPressed && mouseButton === LEFT) {
+    if (mouseButton === LEFT) {
       swingLength = constrain(swingLength + 4, minLength, maxLength);
-      this.swingSpeed = 0;  // Stop swinging while elongating
+      this.swingSpeed = 0;  
     } else {
+      
       // Once the mouse is released, allow the rope to swing
       if (swingLength === maxLength) {
-        // Only start swinging again once the rope has reached its maximum length
         this.swingSpeed = 0.01;
       }
       
@@ -79,8 +79,18 @@ class Hook {
         this.swingSpeed *= -1;  // Reverse the swing direction
       }
 
-      // When the rope is not being elongated, it should return to the minimum length
-      swingLength = constrain(swingLength - 4, minLength, maxLength);
+      if(mouseButton === RIGHT){// When the rope is not being elongated, it should return to the minimum length
+        swingLength = constrain(swingLength - 4, minLength, maxLength);}
     }
+  }
+}
+
+class gold {
+  constructor(){
+    this.x = x
+    this.y = y
+  }
+  show(){
+  ellipse(10,10)
   }
 }
