@@ -4,13 +4,20 @@ let angle = -Math.PI;
 let swingSpeed = 0.02;   
 let maxLength = 800; 
 let minLength = 200; 
-let minerImage;    
+let minerImage;
+let golds = [];  
+let stones = [];
 
 function setup() {
   createCanvas(1000, 1000);
   
   hook = new Hook();
   swingLength = minLength; 
+
+  for (let i = 0; i < 10; i++) {
+    golds.push(new Gold());
+    stones.push(new Stone());
+  }
 }
 
 function draw() {
@@ -28,6 +35,8 @@ function draw() {
   line(0, 200, 1000, 200); 
   hook.update();
   hook.show();
+
+
 }
 
 class Hook {
@@ -38,7 +47,7 @@ class Hook {
     this.originY = this.y; 
     this.angle = Math.PI / 2; 
     this.swingSpeed = 0.01; 
-    this.swingDirection = 1; // 1 for swinging right, -1 for swinging left
+    this.swingDirection = 1; 
   }
 
   show() {
@@ -76,5 +85,34 @@ class Hook {
       this.swingSpeed = 0.01
     }
     
+  }
+}
+
+class Gold {
+  constructor() {
+    this.x = random(0, width); // Random x position
+    this.y = random(200, height); // Random y position in the brown area
+    this.size = random(10, 30); // Random size
+  }
+
+  show() {
+    fill(255, 215, 0); // Gold color
+    noStroke();
+    ellipse(this.x, this.y, this.size, this.size); // Draw gold as a circle
+  }
+}
+
+class Stone {
+  constructor() {
+    this.x = random(0, width); // Random x position
+    this.y = random(200, height); // Random y position in the brown area
+    this.width = random(30, 60); // Random width for stone
+    this.height = random(20, 40); // Random height for stone
+  }
+
+  show() {
+    fill(169, 169, 169); // Stone color (gray)
+    noStroke();
+    rect(this.x, this.y, this.width, this.height); // Draw stone as a rectangle
   }
 }

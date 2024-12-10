@@ -2,9 +2,11 @@ let hook;
 let swingLength;   
 let angle = -Math.PI ; 
 let swingSpeed = 0.02;   
-let maxLength = 600; 
+let maxLength = 900; 
 let minLength = 200; 
-let minerImage;    
+let minerImage; 
+let golds = [];  
+let stones = [];
 
 
 function setup() {
@@ -12,6 +14,14 @@ function setup() {
   
   hook = new Hook();
   swingLength = minLength; 
+
+  for (let i = 0; i < 10; i++) {
+    golds.push(new Gold());
+    
+  }
+  for(let i = 0; i < 6; i++){
+    stones.push(new Stone());
+  }
 }
 
 function draw() {
@@ -29,6 +39,13 @@ function draw() {
   line(0, 200, 1000, 200); 
   hook.update();
   hook.show();
+
+  for (let gold of golds) {
+    gold.show();
+  }
+  for (let stone of stones) {
+    stone.show();
+  }
 }
 
 class Hook {
@@ -39,7 +56,7 @@ class Hook {
     this.originY = this.y; 
     this.angle = Math.PI/2; 
     this.swingSpeed = 0.01; 
-    
+    this.swingDirection = 1;
   }
 
   show() {
@@ -60,37 +77,52 @@ class Hook {
     
     
   update() {
-    // If the mouse is pressed, elongate the rope but stop swinging temporarily
     if (mouseButton === LEFT) {
       swingLength = constrain(swingLength + 4, minLength, maxLength);
       this.swingSpeed = 0;  
-    } else {
-      
-      // Once the mouse is released, allow the rope to swing
+    }else{
       if (swingLength === maxLength) {
         this.swingSpeed = 0.01;
       }
-      
-      // Swinging logic (oscillate back and forth)
-      this.angle += this.swingSpeed;
-
-      // Reverse direction when reaching the limit of the swing
-      if (this.angle > Math.PI || this.angle < 0) {
-        this.swingSpeed *= -1;  // Reverse the swing direction
+      if(mouseButton === RIGHT){
+        swingLength = constrain(swingLength - 4, minLength, maxLength);
+        this.swingSpeed = 0;
       }
+      if(swingLength === minLength){
+        this.swingSpeed = 0.01;
+      }
+      this.angle += this.swingSpeed * this.swingDirection;
+      if (this.angle > Math.PI || this.angle < 0) {
+        this.swingDirection *= -1;
+} 
+}
+}
+}
+class Gold {
+  constructor() {
+    this.x = random(0, width); // Random x position
+    this.y = random(400, 900); // Random y position in the brown area
+    this.size = random(30,  80); // Random size
+  }
 
-      if(mouseButton === RIGHT){// When the rope is not being elongated, it should return to the minimum length
-        swingLength = constrain(swingLength - 4, minLength, maxLength);}
-    }
+  show() {
+    fill(255, 215, 0); // Gold color
+    noStroke();
+    ellipse(this.x, this.y, this.size, this.size); // Draw gold as a circle
   }
 }
 
-class gold {
-  constructor(){
-    this.x = x
-    this.y = y
+class Stone {
+  constructor() {
+    this.x = random(0, width); // Random x position
+    this.y = random(300, 900); // Random y position in the brown area
+    this.width = random(30, 60); // Random width for stone
+    this.height = random(20, 40); // Random height for stone
   }
-  show(){
-  ellipse(10,10)
+
+  show() {
+    fill(169, 169, 169); // Stone color (gray)
+    noStroke();
+    rect(this.x, this.y, this.width, this.height); // Draw stone as a rectangle
   }
 }
