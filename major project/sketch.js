@@ -7,10 +7,16 @@ let minLength = 200;
 let minerImage; 
 let golds = [];  
 let stones = [];
+let img;
 
+function preload() {
+  img = loadImage('M:\cs30\Github Repo\cs30\major project\Screenshot 2024-12-02 115726.png');
+}
 
 function setup() {
   createCanvas(1000, 1000);
+
+  image(img, 0, 0)
   
   hook = new Hook();
   swingLength = minLength; 
