@@ -3,16 +3,23 @@ let swingLength;
 let angle = -Math.PI ; 
 let swingSpeed = 0.02;   
 let maxLength = 900; 
-let minLength = 200; 
-let minerImage; 
+let minLength = 100; 
+let img;
 let golds = [];  
 let stones = [];
+let score = 0;  // Score variable to keep track of the score
+let gameOver = false;  // Flag to track if the game is over
 
 
+function preload() {
+  img = loadImage('man.png');
+}
 
 function setup() {
   createCanvas(1000, 1000);
+
   
+
   hook = new Hook();
   swingLength = minLength; 
 
@@ -25,6 +32,7 @@ function setup() {
   }
 }
 
+
 function draw() {
   background(255, 255, 0); 
   fill(255, 255, 0); 
@@ -33,7 +41,7 @@ function draw() {
   fill(120, 70, 25); 
   rect(0, 200, 1000, height - 200); 
   
-  fill(0, 0, 50); 
+  fill(0, 0, 110); 
   arc(500, 200, 350, 350, PI, 0); 
   
   stroke(0);
@@ -47,16 +55,27 @@ function draw() {
   for (let stone of stones) {
     stone.show();
   }
+  image(img,475,150,50,50); 
+  fill(0);
+  textSize(24);
+  text("Score: " + score, 20, 30);
 }
+
+
+
+
+
+
+
 
 class Hook {
   constructor() {
-    this.x = width/2; 
-    this.y = 200; 
-    this.originX = this.x; 
-    this.originY = this.y; 
-    this.angle = Math.PI/2; 
-    this.swingSpeed = 0.01; 
+    this.x = width / 2;
+    this.y = 200;
+    this.originX = this.x;
+    this.originY = this.y;
+    this.angle = Math.PI / 2;
+    this.swingSpeed = 0.01;
     this.swingDirection = 1;
   }
 
@@ -65,40 +84,85 @@ class Hook {
     let ropeX = this.x + swingLength * cos(this.angle);
     let ropeY = this.y + swingLength * sin(this.angle);
     line(this.x, this.y, ropeX, ropeY);
-    push(); 
+    push();
     translate(ropeX, ropeY);
-    rotate(this.angle + Math.PI / 2); 
+    rotate(this.angle + Math.PI / 2);
     fill(0);
-    triangle(0, -15, -5, 0, 5, 0);
-    triangle(-7,-15,-7,0,0,0)
-    triangle(7,-15,7,0,0,0) // Triangle representing the hook
-    arc(0, 0, 10, 10, PI, 0); 
+    triangle(0, -15, -5, 0, 5, 0); // Triangle representing the hook
+    triangle(-7, -15, -7, 0, 0, 0);
+    triangle(7, -15, 7, 0, 0, 0);
+    arc(0, 0, 10, 10, PI, 0);
     pop(); // Restore the previous drawing state
   }
-    
-    
+
   update() {
     if (mouseButton === LEFT) {
       swingLength = constrain(swingLength + 4, minLength, maxLength);
-      this.swingSpeed = 0;  
-    }else{
+      this.swingSpeed = 0;
+    } else {
       if (swingLength === maxLength) {
         this.swingSpeed = 0.01;
       }
-      if(mouseButton === RIGHT){
+      if (mouseButton === RIGHT) {
         swingLength = constrain(swingLength - 4, minLength, maxLength);
         this.swingSpeed = 0;
       }
-      if(swingLength === minLength){
+      if (swingLength === minLength) {
         this.swingSpeed = 0.01;
       }
       this.angle += this.swingSpeed * this.swingDirection;
       if (this.angle > Math.PI || this.angle < 0) {
         this.swingDirection *= -1;
-} 
+      }
+    }
+    this.checkForObjects();
+  }
+
+  checkForObjects() {
+    // Calculate the position of the hook based on the current swing length and angle
+    let ropeX = this.x + swingLength * cos(this.angle);
+    let ropeY = this.y + swingLength * sin(this.angle);
+
+    for (let gold of golds) {
+      let distance = dist(ropeX, ropeY, gold.x, gold.y);
+      if (distance < 50 && swingLength > minLength) { // If close enough
+        gold.followHook(ropeX, ropeY);
+      }
+    }
+    // Check for collision with stone objects
+    for (let stone of stones) {
+      let distance = dist(ropeX, ropeY, stone.x, stone.y);
+      if (distance < 50 && swingLength > minLength) { // If close enough
+        stone.followHook(ropeX, ropeY);
+      }
+    }
+    // If hook is at minimum length, check for collision with gold or stone
+    if (swingLength === minLength) {
+      // Check for collision with gold objects
+      for (let i = golds.length - 1; i >= 0; i--) {
+        let gold = golds[i];
+        let distance = dist(ropeX, ropeY, gold.x, gold.y);
+        if (distance < 50) { // If close enough
+          golds.splice(i, 1); // Remove the gold from the array
+          score += 50;
+        }
+      }
+
+      // Check for collision with stone objects
+      for (let i = stones.length - 1; i >= 0; i--) {
+        let stone = stones[i];
+        let distance = dist(ropeX, ropeY, stone.x, stone.y);
+        if (distance < 50) { // If close enough
+          stones.splice(i, 1); // Remove the stone from the array
+          score += 10;
+        }
+      }
+       
+
+    }
+  }
 }
-}
-}
+
 class Gold {
   constructor() {
     this.x = random(0, width); // Random x position
@@ -110,6 +174,15 @@ class Gold {
     fill(255, 215, 0); // Gold color
     noStroke();
     ellipse(this.x, this.y, this.size, this.size); // Draw gold as a circle
+  }
+  followHook(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  resetPosition() {
+    this.x = this.originalPosition.x;
+    this.y = this.originalPosition.y;
   }
 }
 
@@ -125,5 +198,14 @@ class Stone {
     fill(169, 169, 169); // Stone color (gray)
     noStroke();
     rect(this.x, this.y, this.width, this.height); // Draw stone as a rectangle
+  }
+  followHook(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  resetPosition() {
+    this.x = this.originalPosition.x;
+    this.y = this.originalPosition.y;
   }
 }
